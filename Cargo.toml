@@ -1,5 +1,5 @@
 [package]
-name = "ao_basis_rust"
+name = "ao_basis"
 version = "0.1.0"
 edition = "2021"
 
