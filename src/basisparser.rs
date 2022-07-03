@@ -1,6 +1,6 @@
 use crate::AtomBasis;
 
-use std::fs::read_to_string;
+use std::fs::{read_dir, read_to_string};
 
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -10,6 +10,17 @@ use ndarray::Array2;
 fn load_basis_file(basis_name: &str) -> String {
     let path = format!("{}/ao_basis/{basis_name}.nw", env!("OUT_DIR"));
     read_to_string(path).unwrap()
+}
+
+pub fn basis_names() -> impl Iterator<Item = String> {
+    read_dir(format!("{}/ao_basis", env!("OUT_DIR")))
+        .unwrap()
+        .map(|entry| {
+            let entry = entry.unwrap();
+            let filename = entry.file_name();
+            let filename = filename.to_str().unwrap();
+            filename.split('.').next().unwrap().to_owned()
+        })
 }
 
 fn get_angular_momentum(c: char) -> i32 {
