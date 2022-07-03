@@ -90,4 +90,11 @@ mod tests {
 
         assert_eq!(bas[2].0, "Li");
     }
+
+    #[test]
+    fn test_basis_names() {
+        for name in basisparser::basis_names() {
+            println!("basis: {}", name);
+        }
+    }
 }
