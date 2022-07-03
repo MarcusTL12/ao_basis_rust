@@ -38,12 +38,12 @@ pub struct LazyAtomBasis {
 }
 
 impl LazyAtomBasis {
-    pub fn get(&mut self) -> &AtomBasis {
+    pub fn get(&mut self) -> &[(i32, Array2<f64>)] {
         if self.basis.is_none() {
             self.basis = Some(deserialize_basis(&self.filepath));
         }
 
-        self.basis.as_ref().unwrap()
+        &self.basis.as_ref().unwrap().basis
     }
 }
 
