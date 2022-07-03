@@ -1,6 +1,11 @@
 pub mod basisparser;
 
-use std::{fs::File, io::Write, path::Path};
+use std::{
+    collections::HashMap,
+    fs::{self, read_dir, File},
+    io::Write,
+    path::Path,
+};
 
 use ndarray::Array2;
 use serde::{Deserialize, Serialize};
@@ -19,6 +24,44 @@ pub fn save_basis(path: &str, basis: &[(String, AtomBasis)]) {
         let mut file = File::create(path).unwrap();
         file.write_all(&serialized).unwrap();
     }
+}
+
+fn deserialize_basis<P: AsRef<Path>>(filepath: P) -> AtomBasis {
+    let serialized = fs::read(filepath).unwrap();
+
+    bincode::deserialize(&serialized).unwrap()
+}
+
+pub struct LazyAtomBasis {
+    basis: Option<AtomBasis>,
+    filepath: String,
+}
+
+impl LazyAtomBasis {
+    pub fn get(&mut self) -> &AtomBasis {
+        if self.basis.is_none() {
+            self.basis = Some(deserialize_basis(&self.filepath));
+        }
+
+        self.basis.as_ref().unwrap()
+    }
+}
+
+pub fn load_basis(path: &str) -> HashMap<String, LazyAtomBasis> {
+    read_dir(path)
+        .unwrap()
+        .map(|atom| {
+            let entry = atom.unwrap();
+            let atom = entry.file_name().into_string().unwrap();
+            let filepath = entry.path().to_str().unwrap().to_owned();
+            let basis = LazyAtomBasis {
+                basis: None,
+                filepath,
+            };
+
+            (atom, basis)
+        })
+        .collect()
 }
 
 #[cfg(test)]
