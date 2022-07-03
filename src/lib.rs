@@ -47,21 +47,37 @@ impl LazyAtomBasis {
     }
 }
 
-pub fn load_basis(path: &str) -> HashMap<String, LazyAtomBasis> {
-    read_dir(path)
-        .unwrap()
-        .map(|atom| {
-            let entry = atom.unwrap();
-            let atom = entry.file_name().into_string().unwrap();
-            let filepath = entry.path().to_str().unwrap().to_owned();
-            let basis = LazyAtomBasis {
-                basis: None,
-                filepath,
-            };
+pub struct LazyBasis {
+    basis: HashMap<String, LazyAtomBasis>,
+}
 
-            (atom, basis)
-        })
-        .collect()
+impl LazyBasis {
+    pub fn get(&mut self, atom: &str) -> &[(i32, Array2<f64>)] {
+        if let Some(basis) = self.basis.get_mut(atom) {
+            basis.get()
+        } else {
+            panic!("Atom \"{atom}\" is not available in basis!");
+        }
+    }
+}
+
+pub fn load_basis(path: &str) -> LazyBasis {
+    LazyBasis {
+        basis: read_dir(path)
+            .unwrap()
+            .map(|atom| {
+                let entry = atom.unwrap();
+                let atom = entry.file_name().into_string().unwrap();
+                let filepath = entry.path().to_str().unwrap().to_owned();
+                let basis = LazyAtomBasis {
+                    basis: None,
+                    filepath,
+                };
+
+                (atom, basis)
+            })
+            .collect(),
+    }
 }
 
 #[cfg(test)]
