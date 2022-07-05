@@ -10,7 +10,7 @@ use std::{
 use ndarray::Array2;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct AtomBasis {
     pub basis: Vec<(i32, Array2<f64>)>,
 }
