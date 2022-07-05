@@ -45,7 +45,7 @@ fn parse_basis(basis_file: &str) -> Vec<(String, AtomBasis)> {
     });
 
     static REG2: Lazy<Regex> = Lazy::new(|| {
-        Regex::new(r"([A-Z][a-z]?) +([A-Z])((?:\n(?: +-?\d+\.\d+(?:E(?:\+|-)\d+)?)+ +)+)").unwrap()
+        Regex::new(r"([A-Z][a-z]?) +([A-Z])((?:\n(?: +-?\d+\.\d+(?:E(?:\+|-)\d+)?)+ *)+)").unwrap()
     });
 
     static REG3: Lazy<Regex> =
